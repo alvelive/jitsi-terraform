@@ -7,20 +7,32 @@ variable "aws_profile" {
 variable "aws_region" {
   description = "AWS Region where this server will be hosted"
   type        = string
+  default     = "eu-south-1"
+}
+variable "aws_access_key" {
+  type        = string
+  description = "AWS access key"
+}
+variable "aws_secret_key" {
+  type        = string
+  description = "AWS secret key"
 }
 variable "email_address" {
   description = "Email to be used for SSL certificate generation using Let's Encrypt"
   type        = string
+  default     = "accounts@osoci.com"
 }
 
 variable "admin_username" {
   description = "Moderator username. Only this user will be allowed to start meets."
   type        = string
+  default     = "admin"
 }
 
 variable "admin_password" {
   description = "Password for moderator user. Only this user will be allowed to start meets."
   type        = string
+  default     = "admin"
 }
 
 variable "enable_ssh_access" {
@@ -35,14 +47,17 @@ variable "ssh_key_name" {
   default     = null
 }
 
-variable "instance_type" {
-  description = "AWS Instance type for this Jitsi instance"
+
+variable "subdomain" {
+  description = "(Optional) Subdomain under a parent domain to host this instance"
   type        = string
+  default     = "dev.meet"
 }
 
 variable "parent_subdomain" {
   description = "Parent domain/subdomain. Server will be hosted at https://<UUIDv4>.parent_subdomain"
   type        = string
+  default     = "alve.live"
 }
 
 variable "enable_recording_streaming" {
@@ -99,12 +114,25 @@ variable "twitch_stream_key" {
 
 variable "rtmp_stream_urls" {
   description = "(Optional) A list of generic RTMP URLs for streaming"
-  type        = list
+  type        = list(any)
   default     = []
 }
 
-variable "subdomain" {
-  description = "(Optional) Subdomain under a parent domain to host this instance"
-  type        = string
-  default     = ""
+variable "vpc_id" {
+  type    = string
+  default = "vpc-0dd39374d101e798a"
+}
+
+variable "subnet_ids" {
+  type = list(string)
+  default = [
+    "subnet-0dcdd8851d084f5ae",
+    "subnet-062678f1b2140fd3e",
+    "subnet-0c062e0020d01bd05"
+  ]
+}
+
+variable "ami_id" {
+  type    = string
+  default = "ami-056bb2662ef466553"
 }

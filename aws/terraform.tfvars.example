@@ -3,13 +3,6 @@
 # Optional values are commented. Uncomment to override defaults.
 #---------------------------------------------------------------
 
-#-------------------
-# AWS Configuration
-#-------------------
-# aws_profile = "default"
-aws_region    = "ap-south-1"
-instance_type = "m5.xlarge"
-
 #-----------------------------------
 # Email Address for Let's Encrypt
 # This email is used for generating
