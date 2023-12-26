@@ -8,34 +8,41 @@
 # This email is used for generating
 # an SSL certificate
 #-----------------------------------
-email_address = "email@example.com"
+aws_regions   = ["eu-south-1", "eu-central-1"]
+aws_access_key = ""
+aws_secret_key = ""
+
+#-----------------------------------
+# Email Address for Let's Encrypt
+# This email is used for generating
+# an SSL certificate
+#-----------------------------------
+email_address = "accounts@osoci.com"
 
 #--------------------------------------------------
-# Admin username and password
+# Admin username, password will be auto-generated
 # This is used for moderator credentials to start
 # a meeting. It is also used to access recorded
 # files when recording/streaming is enabled.
 #--------------------------------------------------
 admin_username = "admin"
-admin_password = "somestrongpassword"
 
 #--------------------------------------------------------------
-# Base domain under which Jitsi server will be deployed
+# Application domain
 #--------------------------------------------------------------
-parent_subdomain = "meet.mydomain.com"
-
+domain = "alve.live"
 #---------------------------------------------------------------------------
-# (Optional) Subdomain under parent domain under which Jitsi will be hosted
+# Subdomain, application will be served under xmpp.meet.{{ subdomain }}.{{ domain }}
 # Uses a random ID if this was not set
 # --------------------------------------------------------------------------
 # subdomain = "dev"
+subdomain = "dev.meet"
 
 #-------------------------------------------------------------
 # SSH access configuration for debugging
 #-------------------------------------------------------------
-# enable_ssh_access = false
-# ssh_key_name      = "your-ssh-key-pair-name"
-
+enable_ssh_access = true
+ssh_key_name      = "dev-global"
 
 #-------------------------------------------------------------
 # Streaming and recording settings

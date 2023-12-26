@@ -9,6 +9,7 @@ XMPP_SERVER="${xmpp_server}"
 XMPP_PASSWORD="${xmpp_password}"
 ADMIN_USER="${admin_username}"
 ADMIN_PASSWORD="${admin_password}"
+PUBLIC_IP=$(curl -s http://icanhazip.com)
 
 function update_system() {
   sudo apt update -y
@@ -39,7 +40,7 @@ function configure_jitsi() {
 jitsi-videobridge   jitsi-videobridge/jvb-hostname  string  $HOSTNAME
 jitsi-meet  jitsi-meet/jvb-serve    boolean false
 jitsi-meet-prosody  jitsi-videobridge/jvb-hostname  string  $XMPP_SERVER
-jitsi-meet-web-config   jitsi-meet/cert-choice  select  I want to use my own certificate
+jitsi-meet-web-config jitsi-meet/cert-choice select 'Generate a new self-signed certificate (You will later get a chance to obtain a Let's encrypt certificate)'
 jitsi-meet-web-config   jitsi-meet/cert-path-crt    string  /etc/ssl/$XMPP_SERVER.crt
 jitsi-meet-web-config   jitsi-meet/cert-path-key    string  /etc/ssl/$XMPP_SERVER.key
 jitsi-meet-web-config   jitsi-meet/jaas-choice  boolean false
@@ -69,12 +70,8 @@ EOT
 
   cat <<EOT | sudo tee -a /etc/jitsi/videobridge/jvb.conf
       org.jitsi.videobridge.octo.BIND_ADDRESS=0.0.0.0
-      org.jitsi.videobridge.octo.PUBLIC_ADDRESS=\$(curl -s http://icanhazip.com)  
+      org.jitsi.videobridge.octo.PUBLIC_ADDRESS=$PUBLIC_IP
       org.jitsi.videobridge.octo.REGION=$REGION
-      org.ice4j.ice.harvest.DISABLE_AWS_HARVESTER=true
-      org.ice4j.ice.harvest.STUN_MAPPING_HARVESTER_ADDRESSES=meet-jit-si-turnrelay.jitsi.net:443
-      org.jitsi.videobridge.ENABLE_STATISTICS=false
-      org.jitsi.videobridge.STATISTICS_TRANSPORT=muc
       org.jitsi.videobridge.xmpp.user.shard.HOSTNAME=$XMPP_SERVER
       org.jitsi.videobridge.xmpp.user.shard.DOMAIN=auth.$XMPP_SERVER
       org.jitsi.videobridge.xmpp.user.shard.USERNAME=jvb

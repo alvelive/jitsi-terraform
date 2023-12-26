@@ -4,19 +4,58 @@ variable "aws_profile" {
   default     = "default"
 }
 
-variable "aws_region" {
-  description = "AWS Region where this server will be hosted"
-  type        = string
-  default     = "eu-south-1"
-}
 variable "aws_access_key" {
   type        = string
   description = "AWS access key"
 }
+
 variable "aws_secret_key" {
   type        = string
   description = "AWS secret key"
 }
+
+variable "aws_regions" {
+  description = "AWS Regions to deploy instances"
+  type        = list(string)
+}
+
+variable "aws_region_mappings" {
+  type = map(string)
+  default = {
+    "af-south-1"     = "afs1"
+    "ap-east-1"      = "ape1"
+    "ap-northeast-1" = "apne1"
+    "ap-northeast-2" = "apne2"
+    "ap-northeast-3" = "apne3"
+    "ap-south-1"     = "aps1"
+    "ap-south-2"     = "aps2"
+    "ap-southeast-1" = "apse1"
+    "ap-southeast-2" = "apse2"
+    "ap-southeast-3" = "apse3"
+    "ap-southeast-4" = "apse4"
+    "ca-central-1"   = "cac1"
+    "ca-west-1"      = "caw1"
+    "eu-central-1"   = "euc1"
+    "eu-central-2"   = "euc2"
+    "eu-north-1"     = "eun1"
+    "eu-south-1"     = "eus1"
+    "eu-south-2"     = "eus2"
+    "eu-west-1"      = "euw1"
+    "eu-west-2"      = "euw2"
+    "eu-west-3"      = "euw3"
+    "il-central-1"   = "ilc1"
+    "me-central-1"   = "mec1"
+    "me-south-1"     = "mes1"
+    "sa-east-1"      = "sae1"
+    "us-east-1"      = "use1"
+    "us-east-2"      = "use2"
+    "us-gov-east-1"  = "usge1"
+    "us-gov-west-1"  = "usgw1"
+    "us-west-1"      = "usw1"
+    "us-west-2"      = "usw2"
+  }
+}
+
 variable "email_address" {
   description = "Email to be used for SSL certificate generation using Let's Encrypt"
   type        = string
@@ -25,12 +64,6 @@ variable "email_address" {
 
 variable "admin_username" {
   description = "Moderator username. Only this user will be allowed to start meets."
-  type        = string
-  default     = "admin"
-}
-
-variable "admin_password" {
-  description = "Password for moderator user. Only this user will be allowed to start meets."
   type        = string
   default     = "admin"
 }
@@ -48,17 +81,17 @@ variable "ssh_key_name" {
 }
 
 
-variable "subdomain" {
-  description = "(Optional) Subdomain under a parent domain to host this instance"
+variable "domain" {
+  description = "Application domain, http server will be hosted at meet.{{ domain }} "
   type        = string
-  default     = "dev.meet"
 }
 
-variable "parent_subdomain" {
-  description = "Parent domain/subdomain. Server will be hosted at https://<UUIDv4>.parent_subdomain"
+
+variable "subdomain" {
+  description = "Subdomain for instances such as eu1-jvb.{{ subdomain }}.{{ domain }}"
   type        = string
-  default     = "alve.live"
 }
+
 
 variable "enable_recording_streaming" {
   description = "Enables recording and streaming capability on Jitsi Meet"
@@ -116,23 +149,4 @@ variable "rtmp_stream_urls" {
   description = "(Optional) A list of generic RTMP URLs for streaming"
   type        = list(any)
   default     = []
-}
-
-variable "vpc_id" {
-  type    = string
-  default = "vpc-0dd39374d101e798a"
-}
-
-variable "subnet_ids" {
-  type = list(string)
-  default = [
-    "subnet-0dcdd8851d084f5ae",
-    "subnet-062678f1b2140fd3e",
-    "subnet-0c062e0020d01bd05"
-  ]
-}
-
-variable "ami_id" {
-  type    = string
-  default = "ami-056bb2662ef466553"
 }

@@ -1,7 +1,10 @@
-# output "server_hostname" {
-#   value = aws_route53_record.jitsi.name
-# }
+output "admin_username" {
+  description = "Variable admin username"
+  value       = var.admin_username
+}
 
-# output "server_url" {
-#   value = "https://${aws_route53_record.jitsi.name}"
-# }
+output "admin_password" {
+  description = "Auto generated admin password"
+  value       = local.admin_password
+}
+
