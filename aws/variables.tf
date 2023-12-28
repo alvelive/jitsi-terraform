@@ -1,9 +1,3 @@
-variable "aws_profile" {
-  description = "AWS Credentials profile"
-  type        = string
-  default     = "default"
-}
-
 variable "aws_access_key" {
   type        = string
   description = "AWS access key"
@@ -15,8 +9,17 @@ variable "aws_secret_key" {
 }
 
 variable "aws_regions" {
-  description = "AWS Regions to deploy instances"
   type        = list(string)
+  description = "AWS Regions to deploy instances"
+}
+
+variable "cloudflare_email" {
+  type        = string
+  description = "cloudflare_email"
+}
+variable "cloudflare_api_token" {
+  type        = string
+  description = "cloudflare_api_token"
 }
 
 variable "aws_region_mappings" {
@@ -92,61 +95,3 @@ variable "subdomain" {
   type        = string
 }
 
-
-variable "enable_recording_streaming" {
-  description = "Enables recording and streaming capability on Jitsi Meet"
-  type        = bool
-  default     = false
-}
-
-variable "record_all_streaming" {
-  description = "(Optional) Records every stream if set to true"
-  type        = bool
-  default     = false
-}
-
-variable "recorded_stream_dir" {
-  description = "(Optional) Base directory where recorded streams will be available."
-  type        = string
-  default     = "/var/www/html/recordings"
-}
-
-variable "facebook_stream_key" {
-  description = "(Optional) Stream Key for Facebook"
-  type        = string
-  default     = ""
-}
-
-variable "periscope_server_url" {
-  description = "(Optional) Periscope streaming server base URL"
-  type        = string
-  default     = "rtmp://in.pscp.tv:80/x"
-}
-
-variable "periscope_stream_key" {
-  description = "(Optional) Streaming key for Periscope"
-  type        = string
-  default     = ""
-}
-
-variable "youtube_stream_key" {
-  description = "(Optional) YouTube stream key"
-  type        = string
-  default     = ""
-}
-
-variable "twitch_ingest_endpoint" {
-  description = "(Optional) Ingest endpoint for Twitch. E.g. rtmp://live-mrs.twitch.tv/app"
-  default     = "rtmp://live-sin.twitch.tv/app"
-}
-
-variable "twitch_stream_key" {
-  description = "(Optional) Streaming key for Twitch"
-  default     = ""
-}
-
-variable "rtmp_stream_urls" {
-  description = "(Optional) A list of generic RTMP URLs for streaming"
-  type        = list(any)
-  default     = []
-}

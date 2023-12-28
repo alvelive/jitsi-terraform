@@ -12,6 +12,9 @@ aws_regions   = ["eu-south-1", "eu-central-1"]
 aws_access_key = ""
 aws_secret_key = ""
 
+cloudflare_email="accounts@osoci.com"
+cloudflare_secret=""
+
 #-----------------------------------
 # Email Address for Let's Encrypt
 # This email is used for generating
