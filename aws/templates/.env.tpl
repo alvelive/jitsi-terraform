@@ -1,64 +1,48 @@
-# Frontend (web service)
-DEPLOYMENTINFO_ENVIRONMENT=${deploymentinfo_environment}
-DEPLOYMENTINFO_ENVIRONMENT_TYPE=${deploymentinfo_environment_type}
-DEPLOYMENTINFO_REGION=${deploymentinfo_region}
-DEPLOYMENTINFO_SHARD=${deploymentinfo_shard}
-DEPLOYMENTINFO_USERREGION=${deploymentinfo_userregion}
+PUBLIC_URL=https://${domain}
+LOG_LEVEL=trace
+CONFIG=~/.jitsi-meet-cfg
+HTTP_PORT=8000
+HTTPS_PORT=8443
+TZ=UTC
+ETHERPAD_TITLE="Alve"
+ETHERPAD_DEFAULT_PAD_TEXT="Welcome to Alve!\n\n"
+ETHERPAD_SKIN_NAME=colibris
+ETHERPAD_SKIN_VARIANTS="super-light-toolbar super-light-editor light-background full-width-editor"
 
-ENABLE_OCTO=${enable_octo}
-ENABLE_COLIBRI_WEBSOCKET=${enable_colibri_websocket}
-ENABLE_AUTH=${enable_auth}
-ENABLE_LETSENCRYPT=${enable_letsencrypt}
-LETSENCRYPT_DOMAIN=${letsencrypt_domain}
-LETSENCRYPT_EMAIL=${letsencrypt_email}
+# Frontend (web service)
+DEPLOYMENTINFO_ENVIRONMENT=production
+DEPLOYMENTINFO_ENVIRONMENT_TYPE=cloud
+DEPLOYMENTINFO_REGION=${region}
+DEPLOYMENTINFO_SHARD=${shard}
+DEPLOYMENTINFO_USERREGION=${region}
+
+# Prosody
+ENABLE_OCTO=true
+ENABLE_AUTH=true
+ENABLE_LETSENCRYPT=true
+LETSENCRYPT_DOMAIN=${domain}
+LETSENCRYPT_EMAIL=${email}
 
 # XMPP server (prosody service)
-ENABLE_OCTO=${enable_octo}
-ENABLE_S2S=${enable_s2s}
-ENABLE_AUTH=${enable_auth}
-
+ENABLE_S2S=true
 XMPP_DOMAIN=${xmpp_domain}
-XMPP_AUTH_DOMAIN=${xmpp_auth_domain}
-XMPP_GUEST_DOMAIN=${xmpp_guest_domain}
-XMPP_MUC_DOMAIN=${xmpp_muc_domain}
-XMPP_INTERNAL_MUC_DOMAIN=${xmpp_internal_muc_domain}
-
-JWT_APP_ID=${jwt_app_id}
+XMPP_AUTH_DOMAIN=auth.${xmpp_domain}
+XMPP_GUEST_DOMAIN=guest.${xmpp_domain}
+XMPP_MUC_DOMAIN=muc.${xmpp_domain}
+XMPP_INTERNAL_MUC_DOMAIN=internal-muc.${xmpp_domain}
+JWT_APP_ID=alve-jitsi
 JWT_APP_SECRET=${jwt_app_secret}
-JWT_ACCEPTED_ISSUERS=${jwt_accepted_issuers}
-JWT_ACCEPTED_AUDIENCES=${jwt_accepted_audiences}
-JWT_ALLOW_EMPTY=${jwt_allow_empty}
-JWT_AUTH_TYPE=${jwt_auth_type}
-JWT_ENABLE_DOMAIN_VERIFICATION=${jwt_enable_domain_verification}
-JWT_TOKEN_AUTH_MODULE=${jwt_token_auth_module}
-
-LOG_LEVEL=${log_level}
+JWT_ALLOW_EMPTY=false
 
 # Focus component (jicofo service)
-ENABLE_OCTO=${enable_octo}
-JICOFO_OCTO_REGION=${jicofo_octo_region}
-JVB_XMPP_SERVER=${jvb_xmpp_server}
-ENABLE_AUTH=${enable_auth}
+JICOFO_OCTO_REGION=${region}
 JICOFO_AUTH_PASSWORD=${jicofo_auth_password}
-JICOFO_AUTH_TYPE=${jicofo_auth_type}
-
-JWT_APP_ID=${jwt_app_id}
-JWT_APP_SECRET=${jwt_app_secret}
-JWT_ACCEPTED_ISSUERS=${jwt_accepted_issuers}
-JWT_ACCEPTED_AUDIENCES=${jwt_accepted_audiences}
-JWT_ALLOW_EMPTY=${jwt_allow_empty}
-JWT_AUTH_TYPE=${jwt_auth_type}
-JWT_ENABLE_DOMAIN_VERIFICATION=${jwt_enable_domain_verification}
-JWT_TOKEN_AUTH_MODULE=${jwt_token_auth_module}
-
-ENABLE_VISITORS=${enable_visitors}
+ENABLE_VISITORS=false
 
 # Video Bridge (jvb service)
-ENABLE_OCTO=${enable_octo}
-JVB_AUTH_USER=${jvb_auth_user}
+ENABLE_COLIBRI_WEBSOCKET=false
+JVB_XMPP_SERVER=${xmpp_domain}
 JVB_AUTH_PASSWORD=${jvb_auth_password}
-JVB_XMPP_SERVER=${jvb_xmpp_server}
-ENABLE_AUTH=${enable_auth}
 
-LETSENCRYPT_DOMAIN=${letsencrypt_domain}
-LETSENCRYPT_EMAIL=${letsencrypt_email}
+# Secrets
+JICOFO_COMPONENT_SECRET=${jicofo_component_secret}

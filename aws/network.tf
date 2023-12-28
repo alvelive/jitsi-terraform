@@ -8,7 +8,6 @@ resource "aws_vpc" "main" {
     Name = "Federated Jitsi VPC"
   }
 
-
   lifecycle {
     create_before_destroy = true
   }
@@ -31,10 +30,16 @@ resource "aws_subnet" "main" {
   }
 }
 
+locals {
+  subnets = [
+    for subnet in aws_subnet.main : subnet.id
+  ]
+}
+
 
 
 locals {
-  tcp = [
+  ports = [
     5222,
     5269,
     5280,
@@ -42,11 +47,11 @@ locals {
     80,
     8080,
     8888,
+    10000
   ]
-  udp = [10000]
 }
 
-resource "aws_security_group" "jitsi_out" {
+resource "aws_security_group" "egress" {
   name        = "jitsi-out"
   description = "jitsi-out security group"
   vpc_id      = aws_vpc.main.id
@@ -63,34 +68,16 @@ resource "aws_security_group" "jitsi_out" {
   }
 }
 
-resource "aws_security_group" "jitsi_tcp" {
-  count       = length(local.tcp)
-  name        = "jitsi-tcp-in"
-  description = "jitsi-tcp-in security group"
+resource "aws_security_group" "jitsi" {
+  count       = length(local.ports)
+  name        = "jitsi-out"
+  description = "jitsi-out security group"
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    from_port   = local.tcp[count.index]
-    to_port     = local.tcp[count.index]
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_security_group" "jitsi_udp" {
-  count       = length(local.udp)
-  name        = "jitsi-udp-in"
-  description = "jitsi-udp-in security group"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    from_port   = local.udp[count.index]
-    to_port     = local.udp[count.index]
-    protocol    = "udp"
+    from_port   = local.ports[count.index]
+    to_port     = local.ports[count.index]
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
