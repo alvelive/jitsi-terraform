@@ -24,12 +24,15 @@ locals {
 }
 
 resource "aws_instance" "services" {
-  count           = length(local.services)
-  ami             = data.aws_ami.latest_ubuntu.id
-  instance_type   = "t3.medium"
-  key_name        = var.ssh_key_name
-  subnet_id       = aws_subnet.main[0].id
-  security_groups = [aws_security_group.jitsi.id]
+  depends_on = [
+    aws_route_table_association.route_table_association
+  ]
+  count                  = length(local.services)
+  ami                    = data.aws_ami.latest_ubuntu.id
+  instance_type          = "t3.medium"
+  key_name               = var.ssh_key_name
+  vpc_security_group_ids = [aws_security_group.jitsi.id]
+  subnet_id              = aws_subnet.main.id
   user_data = base64encode(
     templatefile("${path.module}/install_scripts/install_jitsi.tpl", {
       profile = local.services[count.index].profile

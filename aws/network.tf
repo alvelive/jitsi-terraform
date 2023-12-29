@@ -1,41 +1,35 @@
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
 resource "aws_vpc" "main" {
-  cidr_block = "173.82.0.0/16"
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
   tags = {
-    Name = "Federated Jitsi VPC"
-  }
-
-  lifecycle {
-    create_before_destroy = true
+    Name = "Main vpc Jitsi"
   }
 }
 
-locals {
-  zones = data.aws_availability_zones.available.names
+
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "InternetGateway Jitsi"
+  }
 }
 
 resource "aws_subnet" "main" {
-  count                   = 1
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = "173.82.${count.index}.0/24"
-  availability_zone       = local.zones[count.index]
-  map_public_ip_on_launch = true
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.0.0/24"
 
   tags = {
-    Name = "Subnet-${count.index + 1}"
-  }
-
-  lifecycle {
-    create_before_destroy = true
+    Name = "Subnet Jitsi"
   }
 }
 
+
+
 resource "aws_security_group" "jitsi" {
-  name   = "jitsi-sg"
-  vpc_id = aws_vpc.main.id
+  name        = "Jitsi sg"
+  description = "Jitsi"
+  vpc_id      = aws_vpc.main.id
 
   ingress {
     from_port   = 22
@@ -108,9 +102,31 @@ resource "aws_security_group" "jitsi" {
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
+    from_port   = "0"
+    to_port     = "0"
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "Jitsi sg"
+  }
+}
+
+resource "aws_route_table" "main_route_table" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gatseway.main.id
+  }
+
+  tags = {
+    Name = "Main"
+  }
+}
+
+resource "aws_route_table_association" "route_table_association" {
+  subnet_id      = aws_subnet.main.id
+  route_table_id = aws_route_table.main_route_table.id
 }
