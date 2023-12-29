@@ -34,7 +34,7 @@ resource "aws_instance" "services" {
   ]
   count                  = length(local.services)
   ami                    = data.aws_ami.latest_ubuntu.id
-  instance_type          = "t3.medium"
+  instance_type          = "t2.micro"
   key_name               = aws_key_pair.ssh_key.key_name
   vpc_security_group_ids = [aws_security_group.jitsi.id]
   subnet_id              = aws_subnet.main.id
