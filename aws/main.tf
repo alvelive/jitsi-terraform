@@ -9,7 +9,6 @@ locals {
   master = setproduct([local.region], local.shards, [local.profiles.xmpp], [1])
   jicofo = setproduct([local.region], local.shards, [local.profiles.jicofo], [1])
   jvb    = setproduct([local.region], local.shards, [local.profiles.jvb], [1, 2, 3])
-
   services = [
     for pair in concat(local.master, local.jicofo, local.jvb) : {
       id      = join("-", pair)
@@ -21,6 +20,38 @@ locals {
       index   = pair[3]
     }
   ]
+  services_meta = [
+    for index, service in local.services : {
+      install = templatefile("${path.module}/install_scripts/install_jitsi.tpl", {
+        profile      = local.services[index].profile
+        github_token = var.github_token
+        env_file = templatefile("${path.module}/templates/.env.tpl", {
+          domain                  = service.domain
+          region                  = service.region
+          shard                   = service.shard
+          email                   = var.email
+          xmpp_domain             = "${service.xmpp}.${local.fqdn}"
+          jwt_app_secret          = local.random.jwt_app_secret
+          jicofo_auth_password    = local.random.jicofo_auth_password
+          jvb_auth_password       = local.random.jvb_auth_password
+          jicofo_component_secret = local.random.jicofo_component_secret
+        })
+      })
+      url = "https://${service.domain}"
+    }
+  ]
+}
+
+output "services" {
+  value = local.services[*].domain
+}
+
+output "endpoints" {
+  value = local.services_meta[*].url
+}
+
+output "install_scripts" {
+  value = local.services_meta[*].install
 }
 
 resource "aws_key_pair" "ssh_key" {
@@ -32,27 +63,13 @@ resource "aws_instance" "services" {
   depends_on = [
     aws_route_table_association.route_table_association
   ]
-  count                  = length(local.services)
-  ami                    = data.aws_ami.latest_ubuntu.id
-  instance_type          = "t2.micro"
-  key_name               = aws_key_pair.ssh_key.key_name
-  vpc_security_group_ids = [aws_security_group.jitsi.id]
-  subnet_id              = aws_subnet.main.id
-  user_data = base64encode(
-    templatefile("${path.module}/install_scripts/install_jitsi.tpl", {
-      profile                 = local.services[count.index].profile
-      github_token            = var.github_token
-      domain                  = local.services[count.index].domain
-      region                  = local.services[count.index].region
-      shard                   = local.services[count.index].shard
-      email                   = var.email
-      xmpp_domain             = "${local.services[count.index].xmpp}.${local.fqdn}"
-      jwt_app_secret          = local.random.jwt_app_secret
-      jicofo_auth_password    = local.random.jicofo_auth_password
-      jvb_auth_password       = local.random.jvb_auth_password
-      jicofo_component_secret = local.random.jicofo_component_secret
-    })
-  )
+  count                       = length(local.services)
+  ami                         = data.aws_ami.latest_ubuntu.id
+  instance_type               = "t2.micro"
+  key_name                    = aws_key_pair.ssh_key.key_name
+  vpc_security_group_ids      = [aws_security_group.jitsi.id]
+  subnet_id                   = aws_subnet.main.id
+  user_data                   = base64encode(local.services_meta[count.index].install)
   associate_public_ip_address = true
 
   tags = {
@@ -115,20 +132,4 @@ variable "aws_region_mappings" {
     "us-west-1"      = "usw1"
     "us-west-2"      = "usw2"
   }
-}
-
-output "services" {
-  value = local.services[*].domain
-}
-
-locals {
-  endpoints = [
-    for service in local.services : {
-      url = "https://${service.domain}"
-    }
-  ]
-}
-
-output "endpoints" {
-  value = local.endpoints[*].url
 }
