@@ -42,4 +42,4 @@ cp -R ./custom-prosody-plugins ~/$CONFIG/prosody/prosody-plugins-custom
 mkdir -p ~/$CONFIG/{web,transcripts,prosody/config,jicofo,jvb,jigasi,jibri}
 
 # Start services in selected profiles
-docker compose --profile up ${profile} -d --build
+docker compose --profile ${profile} up -d --build
