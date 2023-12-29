@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+
+
 # Install Docker
 sudo apt update
 sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
@@ -11,19 +13,15 @@ sudo apt-get -y install docker-ce
 sudo usermod -a -G docker $(whoami)
 sudo apt-get install docker-compose -y
 
-# Add user 'jitsi'
-sudo adduser jitsi
-sudo usermod -a -G docker jitsi
 
-# Grant sudo privileges to the user 'jitsi'
-# sudo usermod -aG sudo jitsi
+sudo usermod -aG sudo ubuntu
+sudo usermod -a -G docker ubuntu
+su - ubuntu
 
-# Switch to the user 'jitsi'
-su - jitsi
-cd ~
 
 # Clone repository
-git clone https://${github_token}@github.com/alvelive/docker-jitsi-meet.git
+cd ~/
+git clone https://accountsosoci:${github_token}@github.com/alvelive/docker-jitsi-meet.git
 cd docker-jitsi-meet
 
 # Create ENV
@@ -40,6 +38,8 @@ cp -R ./custom-prosody-plugins ~/$CONFIG/prosody/prosody-plugins-custom
 
 # Generate required config directories
 mkdir -p ~/$CONFIG/{web,transcripts,prosody/config,jicofo,jvb,jigasi,jibri}
+
+
 
 # Start services in selected profiles
 docker compose --profile ${profile} up -d --build

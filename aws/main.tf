@@ -12,7 +12,7 @@ locals {
   services = [
     for pair in concat(local.master, local.jicofo, local.jvb) : {
       id      = join("-", pair)
-      xmpp    = join("-", concat(slice(pair, 0, 2), [local.profiles.xmpp]))
+      xmpp    = join("-", [pair[0], pair[1], local.profiles.xmpp, 1])
       domain  = "${join("-", pair)}.${local.fqdn}"
       region  = pair[0]
       shard   = pair[1]
@@ -37,6 +37,7 @@ locals {
           jicofo_component_secret = local.random.jicofo_component_secret
         })
       })
+      console.log("🚀 ~ file: main.tf:40 ~ forpairinconcat ~ 1:", 1)
       url = "https://${service.domain}"
     }
   ]
