@@ -23,6 +23,11 @@ locals {
   ]
 }
 
+resource "aws_key_pair" "ssh_key" {
+  key_name   = "jitsi-${local.fqdn}"
+  public_key = file(var.public_key)
+}
+
 resource "aws_instance" "services" {
   depends_on = [
     aws_route_table_association.route_table_association
@@ -30,12 +35,13 @@ resource "aws_instance" "services" {
   count                  = length(local.services)
   ami                    = data.aws_ami.latest_ubuntu.id
   instance_type          = "t3.medium"
-  key_name               = var.ssh_key_name
+  key_name               = aws_key_pair.ssh_key.key_name
   vpc_security_group_ids = [aws_security_group.jitsi.id]
   subnet_id              = aws_subnet.main.id
   user_data = base64encode(
     templatefile("${path.module}/install_scripts/install_jitsi.tpl", {
-      profile = local.services[count.index].profile
+      profile      = local.services[count.index].profile
+      github_token = var.github_token
       env_file = templatefile("${path.module}/templates/.env.tpl", {
         domain                  = local.services[count.index].domain
         region                  = local.services[count.index].region
@@ -105,4 +111,20 @@ variable "aws_region_mappings" {
     "us-west-1"      = "usw1"
     "us-west-2"      = "usw2"
   }
+}
+
+output "services" {
+  value = local.services[*].domain
+}
+
+locals {
+  endpoints = [
+    for service in local.services : {
+      url = "https://${service.domain}"
+    }
+  ]
+}
+
+output "endpoints" {
+  value = local.endpoints[*].url
 }

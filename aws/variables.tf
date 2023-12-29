@@ -15,24 +15,23 @@ variable "aws_region" {
 
 variable "cloudflare_api_token" {
   type        = string
-  description = "cloudflare_api_token"
+  description = "Will be used to add route53 name servers to domain's zone"
 }
+
+variable "github_token" {
+  type        = string
+  description = "Will be used to clone the alvelive/docker-jitsi-meet repository"
+}
+
 variable "email" {
   description = "Email to be used for SSL certificate generation using Let's Encrypt"
   type        = string
   default     = "accounts@osoci.com"
 }
 
-variable "enable_ssh_access" {
-  description = "Whether to allow SSH access or not. Requires SSH Key to be imported to AWS Console."
-  type        = bool
-  default     = false
-}
-
-variable "ssh_key_name" {
-  description = "(Optional) SSH Key Pair name as set up in AWS. This is for debugging with SSH access."
+variable "public_key" {
   type        = string
-  default     = null
+  description = "Will be intalled to the newly created instances, you should provide your public key's path"
 }
 
 variable "domain" {

@@ -1,54 +1,34 @@
 #!/bin/bash
 set -e
 
-update_system() {
-  apt update -y
-  apt install apt-transport-https -y
-  apt-add-repository universe
-  apt update
-}
+# Install Docker
+sudo apt update
+sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt update
+sudo apt-get -y install docker-ce
+sudo usermod -a -G docker $(whoami)
+sudo apt-get install docker-compose -y
 
-install_docker() {
-  apt-get install -y \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    software-properties-common
+# Clone repository
+git clone https://${github_token}@github.com/alvelive/docker-jitsi-meet.git
+cd docker-jitsi-meet
 
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-  apt-key fingerprint 0EBFCD88
-  add-apt-repository \
-    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-     $(lsb_release -cs) \
-     stable"
-
-  apt-get update
-  apt-get install -y docker-ce
-  docker run hello-world
-
-  groupadd docker
-  usermod -aG docker $USER
-  systemctl enable docker
-}
-
-git_clone() {
-  git clone https://github.com/alvelive/jitsi-meet.git
-  git clone https://github.com/alvelive/docker-jitsi-meet.git
-  cp -R ./jitsi-meet/resources/prosody-plugins/ $CONFIG/prosody/prosody-plugins-custom
-  cd docker-jitsi-meet
-}
-
-create_env() {
-  echo <<EOT >.env
+# Create ENV
+echo <<EOT >.env
 ${env_file}
 EOT
-}
 
-start_services() {
-  docker compose up -d --build --profile ${profile}
-}
+# Export env to current session
+export $(cat .env | xargs)
 
-update_system
-install_docker
-git_clone
-finalize
+# Copy custom plugins to config dir
+mkdir -p ~/$CONFIG/prosody
+cp -R ./custom-prosody-plugins ~/$CONFIG/prosody/prosody-plugins-custom
+
+# Generate required config directories
+mkdir -p ~/$CONFIG/{web,transcripts,prosody/config,jicofo,jvb,jigasi,jibri}
+
+# Start services in selected profiles
+docker compose up -d --build --profile ${profile}
