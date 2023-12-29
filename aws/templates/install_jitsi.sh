@@ -32,7 +32,7 @@ ${env_file}
 EOT
 
 # Export env to current session
-export $(cat .env | xargs)
+source .env
 
 # Copy custom plugins to config dir
 mkdir -p ~/$CONFIG/prosody

@@ -1,0 +1,15 @@
+{
+  "name": "jitsi-terraform",
+  "version": "1.0.0",
+  "description": "Currently supports Amazon AWS. Read more [here](./aws/).",
+  "main": "index.js",
+  "scripts": {
+    "refresh": "terraform refresh -var='aws_region=eu-west-1' -var='public_key=~/.ssh/jitsi-dev.pub'",
+    "plan": "terraform plan -var='aws_region=eu-west-1' -var='public_key=~/.ssh/jitsi-dev.pub'",
+    "apply": "terraform apply -var='aws_region=eu-west-1' -var='public_key=~/.ssh/jitsi-dev.pub' -auto-approve",
+    "destroy": "terraform destroy -var='aws_region=eu-west-1' -var='public_key=~/.ssh/jitsi-dev.pub' -auto-approve"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
