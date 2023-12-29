@@ -5,4 +5,5 @@
 *.log
 *.swo
 *.swp
+*.tfstate
 terraform.tfvars
