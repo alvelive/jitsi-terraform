@@ -66,13 +66,19 @@ resource "aws_instance" "services" {
   }
 }
 
+resource "aws_eip" "lb" {
+  count    = length(local.services)
+  instance = aws_instance.services[count.index].id
+  domain   = "vpc"
+}
+
 resource "aws_route53_record" "master_a" {
   count           = length(local.services)
   zone_id         = aws_route53_zone.public.zone_id
   name            = local.services[count.index].id
   type            = "A"
   ttl             = 300
-  records         = [aws_instance.services[count.index].public_ip]
+  records         = [aws_eip.lb[count.index].public_ip]
   allow_overwrite = true
 }
 
