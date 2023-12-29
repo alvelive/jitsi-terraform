@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "refresh": "terraform refresh -var='aws_region=eu-west-1' -var='public_key=~/.ssh/jitsi-dev.pub'",
-    "plan": "terraform plan -var='aws_region=eu-west-1' -var='public_key=~/.ssh/jitsi-dev.pub'",
+    "plan": "terraform plan -var='aws_region=eu-west-1' -var='public_key=~/.ssh/jitsi-dev.pub' -out plan",
+    "preapply": "npm run plan",
     "apply": "terraform apply -var='aws_region=eu-west-1' -var='public_key=~/.ssh/jitsi-dev.pub' -auto-approve",
     "destroy": "terraform destroy -var='aws_region=eu-west-1' -var='public_key=~/.ssh/jitsi-dev.pub' -auto-approve"
   },
