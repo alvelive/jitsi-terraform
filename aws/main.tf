@@ -40,19 +40,17 @@ resource "aws_instance" "services" {
   subnet_id              = aws_subnet.main.id
   user_data = base64encode(
     templatefile("${path.module}/install_scripts/install_jitsi.tpl", {
-      profile      = local.services[count.index].profile
-      github_token = var.github_token
-      env_file = templatefile("${path.module}/templates/.env.tpl", {
-        domain                  = local.services[count.index].domain
-        region                  = local.services[count.index].region
-        shard                   = local.services[count.index].shard
-        email                   = var.email
-        xmpp_domain             = "${local.services[count.index].xmpp}.${local.fqdn}"
-        jwt_app_secret          = local.random.jwt_app_secret
-        jicofo_auth_password    = local.random.jicofo_auth_password
-        jvb_auth_password       = local.random.jvb_auth_password
-        jicofo_component_secret = local.random.jicofo_component_secret
-      })
+      profile                 = local.services[count.index].profile
+      github_token            = var.github_token
+      domain                  = local.services[count.index].domain
+      region                  = local.services[count.index].region
+      shard                   = local.services[count.index].shard
+      email                   = var.email
+      xmpp_domain             = "${local.services[count.index].xmpp}.${local.fqdn}"
+      jwt_app_secret          = local.random.jwt_app_secret
+      jicofo_auth_password    = local.random.jicofo_auth_password
+      jvb_auth_password       = local.random.jvb_auth_password
+      jicofo_component_secret = local.random.jicofo_component_secret
     })
   )
   associate_public_ip_address = true
