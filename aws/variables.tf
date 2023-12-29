@@ -8,8 +8,8 @@ variable "aws_secret_key" {
   description = "AWS secret key"
 }
 
-variable "aws_regions" {
-  type        = list(string)
+variable "aws_region" {
+  type        = string
   description = "AWS Regions to deploy instances"
 }
 
@@ -17,17 +17,10 @@ variable "cloudflare_api_token" {
   type        = string
   description = "cloudflare_api_token"
 }
-
-variable "email_address" {
+variable "email" {
   description = "Email to be used for SSL certificate generation using Let's Encrypt"
   type        = string
   default     = "accounts@osoci.com"
-}
-
-variable "admin_username" {
-  description = "Moderator username. Only this user will be allowed to start meets."
-  type        = string
-  default     = "admin"
 }
 
 variable "enable_ssh_access" {

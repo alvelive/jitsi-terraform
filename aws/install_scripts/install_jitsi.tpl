@@ -34,7 +34,7 @@ install_docker() {
 git_clone() {
   git clone https://github.com/alvelive/jitsi-meet.git
   git clone https://github.com/alvelive/docker-jitsi-meet.git
-  cp -R ./jitsi-meet/resources/prosody-plugins/ ./docker-jitsi-meet/prosody-plugins/
+  cp -R ./jitsi-meet/resources/prosody-plugins/ $CONFIG/prosody/prosody-plugins-custom
   cd docker-jitsi-meet
 }
 
