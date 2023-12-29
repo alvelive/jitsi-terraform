@@ -22,3 +22,7 @@ locals {
     jicofo_component_secret = random_id.jicofo_component_secret.hex
   }
 }
+
+output "jwt_app_secret" {
+  value = local.random.jwt_app_secret
+}

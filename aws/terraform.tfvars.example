@@ -8,7 +8,8 @@
 # This email is used for generating
 # an SSL certificate
 #-----------------------------------
-aws_region   = "eu-south-1"
+# should be given in the CLI
+# aws_region   = "eu-south-1"
 aws_access_key = ""
 aws_secret_key = ""
 

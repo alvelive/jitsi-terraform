@@ -118,7 +118,7 @@ resource "aws_route_table" "main_route_table" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gatseway.main.id
+    gateway_id = aws_internet_gateway.main.id
   }
 
   tags = {
