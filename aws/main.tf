@@ -22,10 +22,10 @@ locals {
   ]
   services_meta = [
     for index, service in local.services : {
-      install = templatefile("${path.module}/install_scripts/install_jitsi.tpl", {
+      install = templatefile("${path.module}/templates/install_jitsi.sh", {
         profile      = local.services[index].profile
         github_token = var.github_token
-        env_file = templatefile("${path.module}/templates/.env.tpl", {
+        env_file = templatefile("${path.module}/templates/.env", {
           domain                  = service.domain
           region                  = service.region
           shard                   = service.shard
@@ -95,41 +95,4 @@ resource "aws_route53_record" "master_a" {
   ttl             = 300
   records         = [aws_eip.lb[count.index].public_ip]
   allow_overwrite = true
-}
-
-variable "aws_region_mappings" {
-  type = map(string)
-  default = {
-    "af-south-1"     = "afs1"
-    "ap-east-1"      = "ape1"
-    "ap-northeast-1" = "apne1"
-    "ap-northeast-2" = "apne2"
-    "ap-northeast-3" = "apne3"
-    "ap-south-1"     = "aps1"
-    "ap-south-2"     = "aps2"
-    "ap-southeast-1" = "apse1"
-    "ap-southeast-2" = "apse2"
-    "ap-southeast-3" = "apse3"
-    "ap-southeast-4" = "apse4"
-    "ca-central-1"   = "cac1"
-    "ca-west-1"      = "caw1"
-    "eu-central-1"   = "euc1"
-    "eu-central-2"   = "euc2"
-    "eu-north-1"     = "eun1"
-    "eu-south-1"     = "eus1"
-    "eu-south-2"     = "eus2"
-    "eu-west-1"      = "euw1"
-    "eu-west-2"      = "euw2"
-    "eu-west-3"      = "euw3"
-    "il-central-1"   = "ilc1"
-    "me-central-1"   = "mec1"
-    "me-south-1"     = "mes1"
-    "sa-east-1"      = "sae1"
-    "us-east-1"      = "use1"
-    "us-east-2"      = "use2"
-    "us-gov-east-1"  = "usge1"
-    "us-gov-west-1"  = "usgw1"
-    "us-west-1"      = "usw1"
-    "us-west-2"      = "usw2"
-  }
 }
