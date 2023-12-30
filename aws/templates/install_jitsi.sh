@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Redirect all output to a log file
 exec > >(tee -i install-jitsi.log)
