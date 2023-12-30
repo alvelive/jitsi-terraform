@@ -25,7 +25,7 @@ locals {
       install = templatefile("${path.module}/templates/install_jitsi.sh", {
         profile      = local.services[index].profile
         github_token = var.github_token
-        env_file = templatefile("${path.module}/templates/.env", {
+        env_file = templatefile("${path.module}/templates/env.sh", {
           domain                  = service.domain
           region                  = service.region
           shard                   = service.shard
@@ -48,10 +48,6 @@ output "services" {
 
 output "endpoints" {
   value = local.services_meta[*].url
-}
-
-output "install_scripts" {
-  value = local.services_meta[*].install
 }
 
 resource "aws_key_pair" "ssh_key" {
