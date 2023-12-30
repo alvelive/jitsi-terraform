@@ -8,4 +8,5 @@
 *.swp
 *.tfstate
 node_modules
+plan
 terraform.tfvars
