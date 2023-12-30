@@ -1,9 +1,10 @@
 #!/bin/bash
 set -e
 
-cd /root
-cat <<'INSTALL_SCRIPT' >install-jitsi.sh
+cat <<'INSTALL_SCRIPT' >/home/ubuntu/install-jitsi.sh
 ${install_script}
 INSTALL_SCRIPT
 
-source ./install-jitsi.sh
+chown ubuntu:ubuntu /home/ubuntu/install-jitsi.sh
+chmod +x /home/ubuntu/install-jitsi.sh
+sudo -u ubuntu /home/ubuntu/install-jitsi.sh

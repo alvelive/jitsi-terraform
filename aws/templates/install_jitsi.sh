@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# Redirect all output to a log file
+exec > >(tee -i install-jitsi.log)
+exec 2>&1
+
 # Install Docker
 sudo apt update
 sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
@@ -11,10 +16,8 @@ sudo apt-get install docker-compose -y
 
 sudo usermod -aG sudo ubuntu
 sudo usermod -a -G docker ubuntu
-su - ubuntu
 
 # Clone repository
-cd ~/
 git clone https://${github_token}@github.com/alvelive/docker-jitsi-meet.git
 cd docker-jitsi-meet
 
@@ -35,7 +38,3 @@ mkdir -p ~/$CONFIG/{web,transcripts,prosody/config,jicofo,jvb,jigasi,jibri}
 
 # Start services in selected profiles
 docker compose --profile ${profile} up -d --build
-
-# Redirect all output to a log file
-exec > >(tee -i install-jitsi.log)
-exec 2>&1
