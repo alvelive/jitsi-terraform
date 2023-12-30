@@ -80,6 +80,10 @@ locals {
   ]
 }
 
+output "install_scripts" {
+  value = local.meta[*].user_data
+}
+
 output "services" {
   value = local.meta[*].domain
 }
@@ -87,6 +91,7 @@ output "services" {
 output "endpoints" {
   value = local.meta[*].url
 }
+
 resource "null_resource" "write_to_file" {
   count    = length(local.meta)
   triggers = { scripts = jsonencode(local.meta) }
@@ -94,7 +99,7 @@ resource "null_resource" "write_to_file" {
   provisioner "local-exec" {
     command = <<-EOT
       mkdir -p install
-      cat <<EOF >${path.module}/install/${local.meta[count.index].id}.sh
+      cat <<'EOF' >${path.module}/install/${local.meta[count.index].id}.sh
       ${local.meta[count.index].install_script}
       EOF
     EOT
