@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "refresh": "terraform refresh -var='aws_region=eu-west-1' -var='public_key=~/.ssh/jitsi-dev.pub'",
+    "preplan": "npm run refresh",
     "plan": "terraform plan -var='aws_region=eu-west-1' -var='public_key=~/.ssh/jitsi-dev.pub' -out plan",
     "preapply": "npm run plan",
     "apply": "terraform apply -var='aws_region=eu-west-1' -var='public_key=~/.ssh/jitsi-dev.pub' -auto-approve",

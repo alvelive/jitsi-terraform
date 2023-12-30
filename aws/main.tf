@@ -1,53 +1,104 @@
 locals {
-  shards = ["main"]
+  regions = [local.region]
+  shards  = ["a"]
   profiles = {
     xmpp   = "xmpp"
     jicofo = "jicofo"
     jvb    = "jvb"
   }
   region = var.aws_region_mappings[var.aws_region]
-  master = setproduct([local.region], local.shards, [local.profiles.xmpp], [1])
-  jicofo = setproduct([local.region], local.shards, [local.profiles.jicofo], [1])
-  jvb    = setproduct([local.region], local.shards, [local.profiles.jvb], [1, 2, 3])
-  services = [
+  master = setproduct(local.regions, local.shards, [local.profiles.xmpp], [""])
+  jicofo = setproduct(local.regions, local.shards, [local.profiles.jicofo], [""])
+  jvb    = setproduct(local.regions, local.shards, [local.profiles.jvb], ["1", "2", "3"])
+
+  # Incrementally defining service meta
+  # For better readibility
+
+  premeta1 = [
     for pair in concat(local.master, local.jicofo, local.jvb) : {
-      id      = join("-", pair)
-      xmpp    = join("-", [pair[0], pair[1], local.profiles.xmpp, 1])
-      domain  = "${join("-", pair)}.${local.fqdn}"
       region  = pair[0]
       shard   = pair[1]
       profile = pair[2]
-      index   = pair[3]
+      replica = pair[3]
     }
   ]
-  services_meta = [
-    for index, service in local.services : {
-      install = templatefile("${path.module}/templates/install_jitsi.sh", {
-        profile      = local.services[index].profile
-        github_token = var.github_token
-        env_file = templatefile("${path.module}/templates/env.sh", {
-          domain                  = service.domain
-          region                  = service.region
-          shard                   = service.shard
-          email                   = var.email
-          xmpp_domain             = "${service.xmpp}.${local.fqdn}"
-          jwt_app_secret          = local.random.jwt_app_secret
-          jicofo_auth_password    = local.random.jicofo_auth_password
-          jvb_auth_password       = local.random.jvb_auth_password
-          jicofo_component_secret = local.random.jicofo_component_secret
-        })
-      })
+
+  premeta2 = [
+    for service in local.premeta1 : merge(service, {
+      prefix = "${service.region}${service.shard}"
+      suffix = "${service.profile}${service.replica}"
+    })
+  ]
+
+  premeta3 = [
+    for service in local.premeta2 : merge(service, {
+      id          = "${service.prefix}-${service.suffix}"
+      xmpp_domain = "${service.prefix}-${local.profiles.xmpp}.${local.fqdn}"
+    })
+  ]
+
+  premeta4 = [
+    for service in local.premeta3 : merge(service, {
+      domain = "${service.id}.${local.fqdn}"
+    })
+  ]
+
+  premeta5 = [
+    for service in local.premeta4 : merge(service, {
       url = "https://${service.domain}"
-    }
+      env_file = templatefile("${path.module}/templates/env.sh", {
+        domain                  = service.domain
+        region                  = service.region
+        shard                   = service.shard
+        xmpp_domain             = service.xmpp_domain
+        email                   = var.email
+        jwt_app_secret          = local.random.jwt_app_secret
+        jicofo_auth_password    = local.random.jicofo_auth_password
+        jvb_auth_password       = local.random.jvb_auth_password
+        jicofo_component_secret = local.random.jicofo_component_secret
+      })
+    })
+  ]
+
+  premeta6 = [
+    for service in local.premeta5 : merge(service, {
+      install_script = templatefile("${path.module}/templates/install_jitsi.sh", {
+        profile      = service.profile
+        env_file     = service.env_file
+        github_token = var.github_token
+      })
+    })
+  ]
+
+
+  meta = [
+    for index, service in local.premeta6 : merge(service, {
+      user_data = templatefile("${path.module}/templates/create_install_script.sh", {
+        install_script = service.install_script
+      })
+    })
   ]
 }
 
 output "services" {
-  value = local.services[*].domain
+  value = local.meta[*].domain
 }
 
 output "endpoints" {
-  value = local.services_meta[*].url
+  value = local.meta[*].url
+}
+resource "null_resource" "write_to_file" {
+  count    = length(local.meta)
+  triggers = { scripts = jsonencode(local.meta) }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      mkdir -p install
+      cat <<EOF >${path.module}/install/${local.meta[count.index].id}.sh
+      ${local.meta[count.index].install_script}
+      EOF
+    EOT
+  }
 }
 
 resource "aws_key_pair" "ssh_key" {
@@ -57,19 +108,20 @@ resource "aws_key_pair" "ssh_key" {
 
 resource "aws_instance" "services" {
   depends_on = [
-    aws_route_table_association.route_table_association
+    null_resource.write_to_file,
+    aws_route_table_association.route_table_association,
   ]
-  count                       = length(local.services)
+  count                       = length(local.meta)
   ami                         = data.aws_ami.latest_ubuntu.id
   instance_type               = "t2.micro"
   key_name                    = aws_key_pair.ssh_key.key_name
   vpc_security_group_ids      = [aws_security_group.jitsi.id]
   subnet_id                   = aws_subnet.main.id
-  user_data                   = base64encode(local.services_meta[count.index].install)
+  user_data                   = base64encode(local.meta[count.index].user_data)
   associate_public_ip_address = true
 
   tags = {
-    Name = local.services[count.index].domain
+    Name = local.meta[count.index].domain
   }
 
   lifecycle {
@@ -78,15 +130,15 @@ resource "aws_instance" "services" {
 }
 
 resource "aws_eip" "lb" {
-  count    = length(local.services)
+  count    = length(local.meta)
   instance = aws_instance.services[count.index].id
   domain   = "vpc"
 }
 
 resource "aws_route53_record" "master_a" {
-  count           = length(local.services)
+  count           = length(local.meta)
   zone_id         = aws_route53_zone.public.zone_id
-  name            = local.services[count.index].id
+  name            = local.meta[count.index].id
   type            = "A"
   ttl             = 300
   records         = [aws_eip.lb[count.index].public_ip]
