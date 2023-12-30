@@ -73,6 +73,7 @@ locals {
 
   meta = [
     for index, service in local.premeta6 : merge(service, {
+      target = "${path.module}/install/${service.id}.sh"
       user_data = templatefile("${path.module}/templates/create_install_script.sh", {
         install_script = service.install_script
       })
@@ -94,12 +95,12 @@ output "endpoints" {
 
 resource "null_resource" "write_to_file" {
   count    = length(local.meta)
-  triggers = { always_run = "${timestamp()}" }
+  triggers = { meta = local.meta[count.index].user_data }
 
   provisioner "local-exec" {
     command = <<-EOT
       mkdir -p install
-      cat <<'EOF' >${path.module}/install/${local.meta[count.index].id}.sh
+      cat <<'EOF' >${local.meta[count.index].target}
       ${local.meta[count.index].user_data}
       EOF
     EOT
@@ -110,7 +111,7 @@ resource "aws_key_pair" "ssh_key" {
   key_name   = "jitsi-${local.fqdn}"
   public_key = file(var.public_key)
 }
-  
+
 resource "aws_instance" "services" {
   depends_on                  = [aws_route_table_association.route_table_association]
   count                       = length(local.meta)
@@ -119,7 +120,7 @@ resource "aws_instance" "services" {
   key_name                    = aws_key_pair.ssh_key.key_name
   vpc_security_group_ids      = [aws_security_group.jitsi.id]
   subnet_id                   = aws_subnet.main.id
-  user_data                   = base64encode(local.meta[count.index].user_data)
+  user_data                   = base64encode(file(local.meta[count.index].target))
   associate_public_ip_address = true
 
   tags = {
