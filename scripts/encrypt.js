@@ -21,4 +21,5 @@ const { rel } = require('./rel');
   );
 })();
 
+console.log('Starting to encrypt files');
 await Promise.all(process.argv.slice(2).map((file) => main(file)));
