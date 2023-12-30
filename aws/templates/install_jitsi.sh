@@ -26,7 +26,7 @@ fi
 
 cd /home/ubuntu
 
-if [ ! -d "$REPO_DIR" ]; then
+if [ ! -d "docker-jitsi-meet" ]; then
   # Clone repository
   git clone https://${github_token}@github.com/alvelive/docker-jitsi-meet.git
   cd docker-jitsi-meet
@@ -34,6 +34,8 @@ else
   # Directory exists, no need to clone
   echo "Repository already exists. Updating permissions."
   sudo chown -R ubuntu:ubuntu docker-jitsi-meet
+  cd docker-jitsi-meet
+  git pull
 fi
 
 # Create ENV

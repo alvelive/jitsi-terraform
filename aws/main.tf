@@ -11,9 +11,6 @@ locals {
   jicofo = setproduct(local.regions, local.shards, [local.profiles.jicofo], [""])
   jvb    = setproduct(local.regions, local.shards, [local.profiles.jvb], ["1", "2", "3"])
 
-  # Incrementally defining service meta
-  # For better readibility
-
   premeta1 = [
     for pair in concat(local.master, local.jicofo, local.jvb) : {
       region  = pair[0]
@@ -120,7 +117,7 @@ resource "aws_instance" "services" {
   key_name                    = aws_key_pair.ssh_key.key_name
   vpc_security_group_ids      = [aws_security_group.jitsi.id]
   subnet_id                   = aws_subnet.main.id
-  user_data                   = base64encode(file(local.meta[count.index].target))
+  user_data                   = base64encode(local.meta[count.index].user_data)
   associate_public_ip_address = true
 
   tags = {
