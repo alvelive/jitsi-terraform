@@ -2,8 +2,10 @@
 .history
 .terraform
 *.auto.tfvars
+*.key
 *.log
 *.swo
 *.swp
 *.tfstate
+node_modules
 terraform.tfvars
