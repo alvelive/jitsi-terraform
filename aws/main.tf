@@ -37,7 +37,6 @@ locals {
           jicofo_component_secret = local.random.jicofo_component_secret
         })
       })
-      console.log("🚀 ~ file: main.tf:40 ~ forpairinconcat ~ 1:", 1)
       url = "https://${service.domain}"
     }
   ]
