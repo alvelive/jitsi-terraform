@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-yarn decrypt -- aws/terraform.tfstate aws/terraform.tfvars aws/plan
+yarn decrypt -- aws/terraform.tfstate aws/terraform.tfvars aws/plan aws/terraform.tfstate.backup
