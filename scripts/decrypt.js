@@ -3,7 +3,7 @@ const { writeFile } = require('fs').promises;
 const { readFile } = require('fs').promises;
 const { rel } = require('./rel');
 
-(async function main(arg) {
+async function main(arg) {
   console.log(`Decrypting ${arg}`);
 
   const file = rel(arg);
@@ -21,6 +21,8 @@ const { rel } = require('./rel');
   ]);
 
   await writeFile(file, decryptedData);
-})();
+}
 
-await Promise.all(process.argv.slice(2).map((file) => main(file)));
+Promise.all(process.argv.slice(2).map((file) => main(file))).then(() =>
+  console.log('Successfully decrypted files'),
+);
