@@ -94,13 +94,13 @@ output "endpoints" {
 
 resource "null_resource" "write_to_file" {
   count    = length(local.meta)
-  triggers = { scripts = jsonencode(local.meta) }
+  triggers = { always_run = "${timestamp()}" }
 
   provisioner "local-exec" {
     command = <<-EOT
       mkdir -p install
       cat <<'EOF' >${path.module}/install/${local.meta[count.index].id}.sh
-      ${local.meta[count.index].install_script}
+      ${local.meta[count.index].user_data}
       EOF
     EOT
   }
@@ -110,12 +110,9 @@ resource "aws_key_pair" "ssh_key" {
   key_name   = "jitsi-${local.fqdn}"
   public_key = file(var.public_key)
 }
-
+  
 resource "aws_instance" "services" {
-  depends_on = [
-    null_resource.write_to_file,
-    aws_route_table_association.route_table_association,
-  ]
+  depends_on                  = [aws_route_table_association.route_table_association]
   count                       = length(local.meta)
   ami                         = data.aws_ami.latest_ubuntu.id
   instance_type               = "t2.micro"
