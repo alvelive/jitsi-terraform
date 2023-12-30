@@ -21,7 +21,7 @@ su - ubuntu
 
 # Clone repository
 cd ~/
-git clone https://accountsosoci:${github_token}@github.com/alvelive/docker-jitsi-meet.git
+git clone https://${github_token}@github.com/alvelive/docker-jitsi-meet.git
 cd docker-jitsi-meet
 
 # Create ENV
