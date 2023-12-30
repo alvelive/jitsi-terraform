@@ -31,11 +31,11 @@ ENV_FILE
 export $(cat .env | xargs)
 
 # Copy custom plugins to config dir
-mkdir -p ~/$CONFIG/prosody
-cp -R ./custom-prosody-plugins ~/$CONFIG/prosody/prosody-plugins-custom
+mkdir -p $CONFIG/prosody
+cp -R ./custom-prosody-plugins $CONFIG/prosody/prosody-plugins-custom
 
 # Generate required config directories
-mkdir -p ~/$CONFIG/{web,transcripts,prosody/config,jicofo,jvb,jigasi,jibri}
+mkdir -p $CONFIG/{web,transcripts,prosody/config,jicofo,jvb,jigasi,jibri}
 
 # Start services in selected profiles
 docker compose --profile ${profile} up -d --build
