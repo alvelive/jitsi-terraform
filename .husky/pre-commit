@@ -2,3 +2,4 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 yarn encrypt -- aws/terraform.tfstate aws/terraform.tfvars aws/plan
+git add .
