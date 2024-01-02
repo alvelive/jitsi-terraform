@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-yarn decrypt -- $(find . -type f -name "*.key" | sed 's/\.key$//')
+node scripts/decrypt.js $(find . -type f -name "*.key" | sed 's/\.key$//')

@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-yarn encrypt -- $(find . -type f -name "*.key" | sed 's/\.key$//')
+node scripts/encrypt.js $(find . -type f -name "*.key" | sed 's/\.key$//')
 git add .
