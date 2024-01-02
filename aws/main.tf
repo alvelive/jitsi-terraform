@@ -95,12 +95,13 @@ resource "null_resource" "write_to_file" {
   triggers = { meta = local.meta[count.index].user_data }
 
   provisioner "local-exec" {
-    command = <<-EOT
+    command     = <<-EOT
       mkdir -p install
       cat <<'EOF' >${local.meta[count.index].target}
       ${local.meta[count.index].user_data}
       EOF
     EOT
+    interpreter = ["bash", "-c"]
   }
 }
 
@@ -113,7 +114,7 @@ resource "aws_instance" "services" {
   depends_on                  = [aws_route_table_association.route_table_association]
   count                       = length(local.meta)
   ami                         = data.aws_ami.latest_ubuntu.id
-  instance_type               = "t2.micro"
+  instance_type               = "t3.medium"
   key_name                    = aws_key_pair.ssh_key.key_name
   vpc_security_group_ids      = [aws_security_group.jitsi.id]
   subnet_id                   = aws_subnet.main.id
