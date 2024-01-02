@@ -9,7 +9,7 @@ locals {
   region = var.aws_region_mappings[var.aws_region]
   master = setproduct(local.regions, local.shards, [local.profiles.xmpp], [""])
   jicofo = setproduct(local.regions, local.shards, [local.profiles.jicofo], [""])
-  jvb    = setproduct(local.regions, local.shards, [local.profiles.jvb], ["1", "2", "3"])
+  jvb    = setproduct(local.regions, local.shards, [local.profiles.jvb], ["1", "2"])
 
   premeta1 = [
     for pair in concat(local.master, local.jicofo, local.jvb) : {
@@ -41,7 +41,7 @@ locals {
   ]
 
   premeta5 = [
-    for service in local.premeta4 : merge(service, {
+    for index, service in local.premeta4 : merge(service, {
       url = "https://${service.domain}"
       env_file = templatefile("${path.module}/templates/env.sh", {
         domain                  = service.domain
@@ -131,7 +131,7 @@ resource "aws_instance" "services" {
 }
 
 resource "aws_eip" "lb" {
-  count    = length(local.meta)
+  count    = length(local.premeta1)
   instance = aws_instance.services[count.index].id
   domain   = "vpc"
 }
